@@ -51,8 +51,16 @@ export const get_predictions = async (route_num, stop_tag) => {
         .then(response => response.text())
         .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
         .then(data => {
-            console.log(url)
-            // console.log(data);
+            // if (data.getElementsByTagName('Error')[0].nodeName === "Error")
+            //     throw new Error(data.getElementsByTagName('Error')[0].textContent)
+
+            // console.log(data.getElementsByTagName('predictions'));
+            predictions = data.getElementsByTagName('predictions');
+            // if (data.getElementsByTagName('Error')[0])
+                // console.log('wtf', data.getElementsByTagName('Error')
+            // console.log(url)
+            // console.log(url);
+            // console.log(data.getElementsByTagName('Error')[0]);
             // predictions = data.getElementsByTagName('stop');
         });
     

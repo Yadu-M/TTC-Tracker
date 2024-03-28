@@ -17,7 +17,7 @@ export function Menu() {
   const [predictionsFetched, setPredictionsFetched] = useState(false);
 
 
-  const routeNum = 9; // Random bus num for now
+  const routeNum = 95; // Random bus num for now
   const stopTag = '24460_ar'; // Random stop tag for now
 
     useEffect(() => {
@@ -28,7 +28,8 @@ export function Menu() {
             const fetchedDirections = await get_directions(routeNum);
             const fetchedStops = await get_stops(routeNum);
             const fetchedPredictions = await get_predictions(routeNum, stopTag)
-           
+
+
             setRoutes(fetchedRoutes);
             setRoutesFetched(true);
 
@@ -52,9 +53,9 @@ export function Menu() {
     return (
         <>
             <h1>Menu</h1>
-            {routesFetched && <Dropdown info={routes}/>}
-            {directionsFetched && <Dropdown info={directions}/>}
-            {stopsFetched && <Dropdown info={stops}/>}
+            {routesFetched && <Dropdown info={routes} title="Routes"/>}
+            {directionsFetched && <Dropdown info={directions} title="Directions"/>}
+            {stopsFetched && <Dropdown info={stops} title="Stops"/>}
             {predictionsFetched && <DisplayInfo predictions={predictions}/>}
         </>
     )
