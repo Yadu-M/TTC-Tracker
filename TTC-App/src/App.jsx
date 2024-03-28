@@ -1,35 +1,82 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Fragment, useState } from "react";
+import {
+  GoogleMap,
+  InfoWindowF,
+  MarkerF,
+  useLoadScript,
+} from "@react-google-maps/api";
+
+import "./App.css";
+
+const markers = [
+  {
+    id: 1,
+    name: "Qobustan",
+    position: { lat: 40.0709493, lng: 49.3694411 },
+  },
+  {
+    id: 2,
+    name: "Sumqayit",
+    position: { lat: 40.5788843, lng: 49.5485073 },
+  },
+  {
+    id: 3,
+    name: "Baku",
+    position: { lat: 40.3947365, lng: 49.6898045 },
+  }
+];
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: "AIzaSyDFHXONifq1zWqGnCB4pEh5u5IvbD5ETbE",
+  });
+
+  const [activeMarker, setActiveMarker] = useState(null);
+
+  const handleActiveMarker = (marker) => {
+    if (marker === activeMarker) {
+      return;
+    }
+    setActiveMarker(marker);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Fragment>
+      <div className="container">
+        <h1 className="text-center">Vite + React | Google Map Markers</h1>
+        <div style={{ height: "90vh", width: "100%" }}>
+          {isLoaded ? (
+            <GoogleMap
+              center={{ lat: 40.3947365, lng: 49.6898045 }}
+              zoom={10}
+              onClick={() => setActiveMarker(null)}
+              mapContainerStyle={{ width: "100%", height: "90vh" }}
+            >
+              {markers.map(({ id, name, position }) => (
+                <MarkerF
+                  key={id}
+                  position={position}
+                  onClick={() => handleActiveMarker(id)}
+                  // icon={{
+                  //   url:"https://t4.ftcdn.net/jpg/02/85/33/21/360_F_285332150_qyJdRevcRDaqVluZrUp8ee4H2KezU9CA.jpg",
+                  //   scaledSize: { width: 50, height: 50 }
+                  // }}
+                >
+                  {activeMarker === id ? (
+                    <InfoWindowF onCloseClick={() => setActiveMarker(null)}>
+                      <div>
+                        <p>{name}</p>
+                      </div>
+                    </InfoWindowF>
+                  ) : null}
+                </MarkerF>
+              ))}
+            </GoogleMap>
+          ) : null}
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </Fragment>
+  );
 }
 
-export default App
+export default App;
