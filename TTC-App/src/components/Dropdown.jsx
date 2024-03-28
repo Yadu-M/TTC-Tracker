@@ -12,12 +12,15 @@ export function Dropdown(items) {
 
     return (
         <div className="routes">
+            <select>
             {loaded && Array.from(elements).map((element, index) => {
                 const title = element.attributes && element.attributes.title && element.attributes.title.nodeValue;
+                console.log(title)
                 return (
-                    <div key={index}> <h6>{title}</h6></div>
+                    <option key={index}> <h6>{title}</h6></option>
                 )
             })}
+            </select>
         </div>
     )
 }
