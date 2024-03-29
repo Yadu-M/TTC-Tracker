@@ -1,5 +1,7 @@
+import { xmlToArray } from "../utils/xmlToArray";
+
 const GET_ROUTES = 'https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=ttc'
-const GET_DIRECTIONS = 'https://retro.umoiq.com/service/publicXMLFeed?command=routeConfig&a=ttc&r='
+const GET_DIRECTIONS = 'https://retro.umoiq.com/service/publicXMLFeed?command=routeConfig&terse&a=ttc&r='
 const GET_PREDICTION = 'https://retro.umoiq.com/service/publicXMLFeed?command=predictions&a=ttc&' //r=95&s=24460_ar
 
 
@@ -13,21 +15,64 @@ export const get_routes = async () => {
             routes = data.getElementsByTagName('route');
         });
     
-    return routes;
+    // xmlToArray(routes);
+    return xmlToArray(routes, ['tag', 'title', 'tag']);
     
 }
 
 export const get_directions = async (route_num) => {
     let directions = [];
+    let stops = [];
+    let directionData = [];
+    let stopsData = [];
     await fetch(`${GET_DIRECTIONS}${route_num}`)
         .then(response => response.text())
         .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
         .then(data => {
             directions = data.getElementsByTagName('direction');
+            stops = data.getElementsByTagName('route');
         });
+
+        if (stops.length !== 0 && directions.length !== 0) {
+            stops = stops[0].children;
+            
+            stopsData = Array.from(stops).map(stop => {
+                let tag;
+                let title;
+                let stopId;
+                if (stop.attributes !== undefined) {
+                    if (stop.attributes.stopId !== undefined) {
+                        tag = stop.attributes.tag.value;
+                        title = stop.attributes.title.value;
+                        stopId = stop.attributes.stopId.value
+
+                        return {
+                            [tag] : {
+                                "title": title,
+                                "stopId": stopId
+                            }
+                        }
+                    }
+                }       
+            
+                    
+            }).reduce((acc, obj) => ({ ...acc, ...obj }), {}); // Merge all objects into a single one
+
+
+            directionData = Array.from(directions).map(element => {
+                const title = element.getAttribute('title');
+                const tags = Array.from(element.children).map(e => e.getAttribute('tag'));
+                return { [title]: tags };
+            });
+
+            const obj =  {
+                stopsData,
+                directions: Object.assign({}, ...directionData)
+            }
     
-        // console.log(directions);
-    return directions;
+            return obj;
+        }
+
 }
 
 export const get_stops = async (route_num) => {
@@ -39,8 +84,7 @@ export const get_stops = async (route_num) => {
             directions = data.getElementsByTagName('stop');
         });
     
-        // console.log(directions);
-    return directions;
+        return xmlToArray(directions);
 }
 
 export const get_predictions = async (route_num, stop_tag) => {
@@ -51,20 +95,9 @@ export const get_predictions = async (route_num, stop_tag) => {
         .then(response => response.text())
         .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
         .then(data => {
-            // if (data.getElementsByTagName('Error')[0].nodeName === "Error")
-            //     throw new Error(data.getElementsByTagName('Error')[0].textContent)
-
-            // console.log(data.getElementsByTagName('predictions'));
             predictions = data.getElementsByTagName('predictions');
-            // if (data.getElementsByTagName('Error')[0])
-                // console.log('wtf', data.getElementsByTagName('Error')
-            // console.log(url)
-            // console.log(url);
-            // console.log(data.getElementsByTagName('Error')[0]);
-            // predictions = data.getElementsByTagName('stop');
         });
     
-        // console.log(directions);
     return predictions;
 }
 

@@ -1,7 +1,7 @@
 
 export function DisplayInfo(item) {
     
-    console.log(item.predictions);
+    // console.log(item.predictions);
 
     return (<>
         <h1>PREDICTIONS</h1>

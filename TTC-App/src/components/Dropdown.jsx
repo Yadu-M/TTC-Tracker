@@ -1,26 +1,32 @@
+export function Dropdown({ info, title, onSelect, stringSplitSymbol }) {
 
-export function Dropdown(items) {
-
-
-    let elements;
     let loaded = false;
-    if (items.info !== undefined) {
-        loaded = true;
-        elements = items.info
-    }
 
+    if (info !== undefined) {
+      loaded = true;
+    }
+  
+    const handleSelectChange = (event) => {
+      let selectedValue = parseInt(event.target.value);      
+      // console.log(selectedValue);
+      onSelect(selectedValue);
+    };
+  
     return (
-        <div className="routes">
-            <h1>{items.title}</h1>
-            <select>
-            {loaded && Array.from(elements).map((element, index) => {
-                const title = element.attributes && element.attributes.title && element.attributes.title.nodeValue;
-                console.log(title)
-                return (
-                    <option key={index}> <h6>{title}</h6></option>
-                )
+      <div className={title}>
+        <h1>{title}</h1>
+        <select onChange={handleSelectChange}>
+          {loaded &&
+            info.map((element, index) => {
+              // console.log(element);
+              return (
+                <option key={index} value={element.value}>
+                  {element.title}
+                </option>
+              );
             })}
-            </select>
-        </div>
-    )
-}
+        </select>
+      </div>
+    );
+  }
+  
