@@ -1,4 +1,4 @@
-export function Dropdown({ info, title, onSelect, stringSplitSymbol }) {
+export function Dropdown({ info, title, onSelect }) {
 
     let loaded = false;
 
