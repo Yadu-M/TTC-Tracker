@@ -97,7 +97,7 @@ def get_stops(tag: int, direction: str):
 
 
 @app.get("/predictions/{route}/{stop}")
-def get_predictions(tag: int, stop: int):
+def get_predictions(route: int, stop: int):
     data_to_send = []
     
     r = requests.get(f'https://retro.umoiq.com/service/publicXMLFeed?command=predictions&a=ttc&r={route}&s={stop}')
