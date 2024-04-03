@@ -1,52 +1,46 @@
 import { useEffect, useState } from "react";
-import { get_route_info, get_directions } from "../api/routes";
+import { get_directions, get_stops } from "../api/routes";
 import DropDown from "./DropDown"
 
 export function Menu({ route_info }) {
   
   const routes = route_info;
 
-  const [userRouteInfo, setUseRouteInfo] = useState([]);
+  // const [userRouteInfo, setUseRouteInfo] = useState([]);
   const [routeDirections, setRouteDirections] = useState([]);
+  const [routeStops, setRouteStops] = useState([]);
 
   const [userRoute, setUserRoute] = useState(routes[0]["tag"]);
   const [userDirection, setUserDirection] = useState("South - 7 Bathurst towards Bathurst Station");
-  const [userStops, setUserStops] = useState([]);
+  const [userStop, setUserStop] = useState([]);
 
-  // Fetches the user route direction
+  // Updates the directions
   useEffect(() => {
-    // async function get_route_data() {
-    //   const data = await get_route_info(userRoute);  
-    //   setUseRouteInfo(data);
-    // }
     async function get_route_directions() {
       const data = await get_directions(userRoute);  
       setRouteDirections(data);
+      setUserDirection(data[0]["direction"])
     }    
-    // get_route_data();
-    async function get_route_stops() {
-      
-    }
     get_route_directions();
 
   }, [userRoute])
 
-
-  // Fetches the user stop
+  // Updates stops
   useEffect(() => {
-
-  }, [userRoute])
-
+    async function get_route_stops() {
+      const data = await get_stops(userRoute, userDirection);  
+      setRouteStops(data);
+    }
+    get_route_stops();
+  }, [userRoute, userDirection])
 
 
   return (
     <>
       <h1>Menu</h1>
-      {/* {userRouteInfo.length && console.log(userRouteInfo)} */}\
-      {routeDirections.length && console.log(routeDirections)}
       {routes.length && <DropDown info={routes} title="Routes" onSelect={(item) => setUserRoute(item)} attributes={{"title": "title", "value": "tag"}}/>}
       {routeDirections.length && <DropDown info={routeDirections} title="Directions" onSelect={(item) => setUserDirection(item)} attributes={{"title": "direction", "value": "direction"}}/>}
-      {/* {stopsFetched && <Dropdown info={stops} title="Stops" onSelect={setSelectedStop}/>} */}
+      {routeStops.length && <DropDown info={routeStops} title="Stops" onSelect={(item) => setUserStop(item)} attributes={{"title": "title", "value": "tag"}}/>}
       {/* {predictionsFetched && <DisplayInfo predictions={predictions}/>} */}
     </>
   );
