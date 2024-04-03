@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { get_directions, get_stops } from "../api/routes";
+import { get_directions, get_stops, get_predictions } from "../api/routes";
 import DropDown from "./DropDown"
+import DisplayInfo from "./DisplayPrediction"
 
 export function Menu({ route_info }) {
   
@@ -13,6 +14,7 @@ export function Menu({ route_info }) {
   const [userRoute, setUserRoute] = useState(routes[0]["tag"]);
   const [userDirection, setUserDirection] = useState("South - 7 Bathurst towards Bathurst Station");
   const [userStop, setUserStop] = useState([]);
+  const [predictions, setPredictions] = useState([]);
 
   // Updates the directions
   useEffect(() => {
@@ -30,10 +32,20 @@ export function Menu({ route_info }) {
     async function get_route_stops() {
       const data = await get_stops(userRoute, userDirection);  
       setRouteStops(data);
+      setUserStop(data[0]["tag"]);
     }
     get_route_stops();
   }, [userRoute, userDirection])
 
+
+  useEffect(() => {
+    async function get_prediction() {
+      const data = await get_predictions(userRoute, userStop);
+      setPredictions(data);
+    }
+
+    get_prediction();
+  }, [userRoute, userStop])
 
   return (
     <>
@@ -41,7 +53,7 @@ export function Menu({ route_info }) {
       {routes.length && <DropDown info={routes} title="Routes" onSelect={(item) => setUserRoute(item)} attributes={{"title": "title", "value": "tag"}}/>}
       {routeDirections.length && <DropDown info={routeDirections} title="Directions" onSelect={(item) => setUserDirection(item)} attributes={{"title": "direction", "value": "direction"}}/>}
       {routeStops.length && <DropDown info={routeStops} title="Stops" onSelect={(item) => setUserStop(item)} attributes={{"title": "title", "value": "tag"}}/>}
-      {/* {predictionsFetched && <DisplayInfo predictions={predictions}/>} */}
+      {predictions.length && <DisplayInfo predictions={predictions}/>}
     </>
   );
 }
