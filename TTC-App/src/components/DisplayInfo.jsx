@@ -1,5 +1,5 @@
 
-export function DisplayInfo(item) {
+export default function DisplayInfo(item) {
     
     // console.log(item.predictions);
 

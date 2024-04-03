@@ -1,68 +1,51 @@
-import { Dropdown } from "./Dropdown"
-import { DisplayInfo } from "./DisplayInfo"
-import { useEffect } from "react";
-import { get_routes, get_directions, get_stops, get_predictions } from "../api/routes";
-import { useState } from "react";
-import { clean_directions_data, clean_routes_data } from "../utils/dataParse";
+import { useEffect, useState } from "react";
+import { get_route_info, get_directions } from "../api/routes";
+import DropDown from "./DropDown"
 
-export function Menu() {
+export function Menu({ route_info }) {
+  
+  const routes = route_info;
 
-  const [routes, setRoutes] = useState({});    
-  const [routeInfo, setRouteInfo] = useState({});
-  const [directions, setDirections] = useState([]);
-  const [stops, setStops] = useState([]);
-  const [predictions, setPredictions] = useState([]);
+  const [userRouteInfo, setUseRouteInfo] = useState([]);
+  const [routeDirections, setRouteDirections] = useState([]);
 
-  // Selected stops by user
-  const [selectedRoute, setSelectedRoute] = useState(null);
-  const [selectedDirection, setSelectedDirection] = useState(null);
-  const [selectedStop, setSelectedStop] = useState(null);
+  const [userRoute, setUserRoute] = useState(routes[0]["tag"]);
+  const [userDirection, setUserDirection] = useState("South - 7 Bathurst towards Bathurst Station");
+  const [userStops, setUserStops] = useState([]);
 
-  const [routesFetched, setRoutesFetched] = useState(false);
-  const [routeInfoFetched, setRouteInfoFetched] = useState(false);
-  const [directionsFetched, setDirectionsFetched] = useState(false);
-  const [predictionsFetched, setPredictionsFetched] = useState(false);
-
+  // Fetches the user route direction
   useEffect(() => {
-    async function fetch_routes() {
-      const available_routes = await get_routes();
-      setSelectedRoute(7); // Default route
-      if (available_routes !== undefined) {
-        setRoutes(clean_routes_data(available_routes));
-        setRoutesFetched(true);
-      }
+    // async function get_route_data() {
+    //   const data = await get_route_info(userRoute);  
+    //   setUseRouteInfo(data);
+    // }
+    async function get_route_directions() {
+      const data = await get_directions(userRoute);  
+      setRouteDirections(data);
+    }    
+    // get_route_data();
+    async function get_route_stops() {
+      
     }
+    get_route_directions();
 
-    fetch_routes();
-  }, []);
+  }, [userRoute])
 
-  useEffect(() => {      
-    async function fetch_stops_directions() {
-      if (selectedRoute !== null) {
-        const selected_routes_data = await get_directions(selectedRoute);
 
-        if (selected_routes_data !== undefined) {
-          setRouteInfo(selected_routes_data);
-          setRouteInfoFetched(true);
-        }
-      }
-    }
-
-    fetch_stops_directions(); 
-  }, [selectedRoute]);
-
+  // Fetches the user stop
   useEffect(() => {
-    if (routeInfoFetched) {
-      setDirections(clean_directions_data(routeInfo));
-      setDirectionsFetched(true);
-    }
-  }, [routeInfoFetched, routeInfo]);
+
+  }, [userRoute])
+
+
 
   return (
     <>
       <h1>Menu</h1>
-      {routesFetched && <Dropdown info={routes} title="Routes" onSelect={setSelectedRoute} stringSplitSymbol={'-'}/>}
-      {routeInfoFetched && <Dropdown info={directions} title="Directions" onSelect={setSelectedDirection}/>}
+      {/* {userRouteInfo.length && console.log(userRouteInfo)} */}\
+      {routeDirections.length && console.log(routeDirections)}
+      {routes.length && <DropDown info={routes} title="Routes" onSelect={(item) => setUserRoute(item)} attributes={{"title": "title", "value": "tag"}}/>}
+      {routeDirections.length && <DropDown info={routeDirections} title="Directions" onSelect={(item) => setUserDirection(item)} attributes={{"title": "direction", "value": "direction"}}/>}
       {/* {stopsFetched && <Dropdown info={stops} title="Stops" onSelect={setSelectedStop}/>} */}
       {/* {predictionsFetched && <DisplayInfo predictions={predictions}/>} */}
     </>
