@@ -1,9 +1,7 @@
 from fastapi import FastAPI, status, HTTPException
-from database import db_init
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 import xmltodict
-
 
 app = FastAPI()
 
@@ -26,58 +24,65 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-async def startup_event():
-    global db
-    db = db_init()   
-
-@app.get("/")
-def read_root():
-    print(db)
-    return {"Hello": "World"}
-
 @app.get("/routes")
 def get_routes():
-    routes = db['Routes']
-    data = routes.find()
     data_to_send = []
-    for route in data:
-        data_to_send.append({"tag": route['@tag'],
-                            
-                            "title": route['@title']})
+    
+    r = requests.get("https://retro.umoiq.com/service/publicXMLFeed?command=routeList&a=ttc")
+    if r.ok:
+        data = xmltodict.parse(r.content)
+        routes_data = data['body']['route']
+        for route in routes_data:
+            data_to_send.append({"tag": route['@tag'],                            
+                                "title": route['@title']})
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Something went wrong")    
     return data_to_send
 
 
 @app.get("/directions_stops/{tag}")
 def get_directions_and_stops(tag: int):
-    directions_stops = []
-    try:
-        r = requests.get(f'https://retro.umoiq.com/service/publicXMLFeed?command=routeConfig&terse&a=ttc&r={tag}')
-        if r.ok:
-            data = xmltodict.parse(r.content)
-            for direction in data["body"]["route"]["direction"]:
-                stops = [tag["@tag"] for tag in direction["stop"]]
-                directions_stops.append({
-                    "direction": direction["@title"],
-                    "stops": stops
-                })         
-            
-            print(directions_stops)
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e)
-    return directions_stops
+    data_to_send = []
+    
+    r = requests.get(f'https://retro.umoiq.com/service/publicXMLFeed?command=routeConfig&terse&a=ttc&r={tag}')
+    if r.ok:
+        data = xmltodict.parse(r.content)
+        for direction in data["body"]["route"]["direction"]:
+            stops = [tag["@tag"] for tag in direction["stop"]]
+            data_to_send.append({
+                "direction": direction["@title"],
+                "stops": stops
+            })         
+        
+        print(data_to_send)
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Something went wrong")
+    return data_to_send
+
+
+@app.get("/directions/{tag}")
+def get_directions(tag: int):
+    data_to_send = []    
+    r = requests.get(f'https://retro.umoiq.com/service/publicXMLFeed?command=routeConfig&terse&a=ttc&r={tag}')
+    if r.ok:
+        data = xmltodict.parse(r.content)
+        for direction in data["body"]["route"]["direction"]:
+            data_to_send.append({"direction": direction["@title"]})
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Something went wrong")
+    return data_to_send
 
 
 @app.get("/predictions/{route}/{stop}")
-def get_predictions(route: int, stop: int):
+def get_predictions(route: str, stop: int):
     data_to_send = []
-    try:
-        r = requests.get(f'https://retro.umoiq.com/service/publicXMLFeed?command=predictions&a=ttc&r={route}&s={stop}')
-        data = xmltodict.parse(r.content)
-        # print(data["body"]["predictions"]["direction"]["prediction"])
+    
+    r = requests.get(f'https://retro.umoiq.com/service/publicXMLFeed?command=predictions&a=ttc&r={route}&s={stop}')
+    data = xmltodict.parse(r.content)
+    if ("Error" in data["body"]):    
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error happened")
+    else:    
         for prediction_data in data["body"]["predictions"]["direction"]["prediction"]:
             data_to_send.append({"minute": prediction_data["@minutes"],
                                  "seconds": prediction_data["@seconds"]})
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e)
     return data_to_send
