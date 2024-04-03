@@ -62,3 +62,18 @@ export async function get_stops(route_num, directions) {
     }
 }
 
+export async function get_predictions(route_num, tag) {
+    try {
+        // console.log(route_num, directions);
+        const response = await fetch(`${GET_PREDICTION}${route_num}/${tag}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch routes');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching routes:', error);
+        throw error; // Propagate the error so it can be caught by the caller
+    }
+}
+
