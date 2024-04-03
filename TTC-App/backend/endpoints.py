@@ -73,8 +73,31 @@ def get_directions(tag: int):
     return data_to_send
 
 
+@app.get("/stops/{tag}/{direction}")
+def get_stops(tag: int, direction: str):
+    data_to_send = []
+    stops_in_order = []
+    print(direction)
+    r = requests.get(f'https://retro.umoiq.com/service/publicXMLFeed?command=routeConfig&terse&a=ttc&r={tag}')
+    if r.ok:
+        data = xmltodict.parse(r.content)
+        for route_direction in data["body"]["route"]["direction"]:
+            if route_direction["@title"] == direction:
+                for stop__ in route_direction["stop"]:
+                    stops_in_order.append(stop__["@tag"])
+        
+        for stop in stops_in_order:
+            for stop_ in data["body"]["route"]["stop"]:            
+                if stop == stop_["@tag"]:
+                    data_to_send.append({"tag": stop_["@tag"], 
+                                         "title": stop_["@title"]})            
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Something went wrong")
+    return data_to_send    
+
+
 @app.get("/predictions/{route}/{stop}")
-def get_predictions(route: str, stop: int):
+def get_predictions(tag: int, stop: int):
     data_to_send = []
     
     r = requests.get(f'https://retro.umoiq.com/service/publicXMLFeed?command=predictions&a=ttc&r={route}&s={stop}')
