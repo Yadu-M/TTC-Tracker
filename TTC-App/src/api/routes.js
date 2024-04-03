@@ -1,6 +1,7 @@
 const GET_ROUTES = 'http://127.0.0.1:8000/routes'
 const GET_DIRECTIONS_STOPS = 'http://127.0.0.1:8000/directions_stops/' //route num
 const GET_DIRECTIONS = 'http://127.0.0.1:8000/directions/'
+const GET_STOPS = 'http://127.0.0.1:8000/stops/' // 9/South%20-%209%20Bellamy%20towards%20Warden%20Station
 const GET_PREDICTION = 'http://127.0.0.1:8000/predictions/' //route num / stop id
 
 
@@ -46,9 +47,10 @@ export async function get_directions(route_num) {
     }
 }
 
-export async function get_stops(route_num, stop) {
+export async function get_stops(route_num, directions) {
     try {
-        const response = await fetch(`${GET_DIRECTIONS}${route_num}`);
+        // console.log(route_num, directions);
+        const response = await fetch(`${GET_STOPS}${route_num}/${directions}`);
         if (!response.ok) {
             throw new Error('Failed to fetch routes');
         }
