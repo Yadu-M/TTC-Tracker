@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { get_directions, get_stops, get_predictions } from "../api/routes";
-import DropDown from "./DropDown"
+import DropDown from "./Dropdown"
 import DisplayInfo from "./DisplayPrediction"
 
 export function Menu({ route_info }) {
