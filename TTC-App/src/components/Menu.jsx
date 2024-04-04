@@ -7,7 +7,6 @@ export function Menu({ route_info }) {
   
   const routes = route_info;
 
-  // const [userRouteInfo, setUseRouteInfo] = useState([]);
   const [routeDirections, setRouteDirections] = useState([]);
   const [routeStops, setRouteStops] = useState([]);
 
@@ -16,7 +15,8 @@ export function Menu({ route_info }) {
   const [userStop, setUserStop] = useState([]);
   const [predictions, setPredictions] = useState([]);
 
-  // Updates the directions
+
+  // Updates directions
   useEffect(() => {
     async function get_route_directions() {
       const data = await get_directions(userRoute);  
@@ -26,6 +26,7 @@ export function Menu({ route_info }) {
     get_route_directions();
 
   }, [userRoute])
+
 
   // Updates stops
   useEffect(() => {
@@ -38,14 +39,25 @@ export function Menu({ route_info }) {
   }, [userRoute, userDirection])
 
 
-  useEffect(() => {
-    async function get_prediction() {
-      const data = await get_predictions(userRoute, userStop);
-      setPredictions(data);
-    }
+  // Gets bus predictions based on route and stop
+  async function get_prediction() {
+    const data = await get_predictions(userRoute, userStop);
+    setPredictions(data);
+  }
 
+
+  // Gets inital predictions
+  useEffect(() => {
     get_prediction();
   }, [userRoute, userStop])
+
+
+  // Updated predictions periodically
+  useEffect(() => {
+    const update = setInterval(async () => await get_prediction(userRoute, userStop), 15000);
+    return () => clearInterval(update);
+  }, [])
+
 
   return (
     <>
