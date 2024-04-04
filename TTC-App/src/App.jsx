@@ -17,13 +17,10 @@ function App() {
   }, []);
 
   return (
-    <>
-      {/* Add the logo image */}
+    <div className="container">
       <img src={logo} alt="TTC Logo" className="logo" />
-
-      {/* Render the Menu component */}
       {routes.length && <Menu route_info={routes} />}
-    </>
+    </div>
   );
 }
 

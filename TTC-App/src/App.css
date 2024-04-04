@@ -4,10 +4,23 @@
   padding: 2rem;
   text-align: center;
 }
-
+.container {
+  max-width: 1200px; 
+  width: 600px; 
+  margin: 0 auto;
+  border: 10px double #006400; 
+  padding: 20px;
+}
+.custom-dropdown {
+  width: 400px; 
+  height: 40px;
+}
 .logo {
-  height: 6em;
-  padding: 1.5em;
+ /* height: 6em;*/
+  height: 100px; 
+  width: 180px; /* Maintain aspect ratio */
+  margin-bottom: 20px;
+  padding: 1.2em;
   will-change: filter;
   transition: filter 300ms;
 }
@@ -16,6 +29,14 @@
 }
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
+}
+.prediction {
+  display: inline-block;
+  background-color: #4caf50; /* Green background color */
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin-right: 5px;
 }
 
 @keyframes logo-spin {

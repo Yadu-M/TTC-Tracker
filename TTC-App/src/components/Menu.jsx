@@ -49,7 +49,7 @@ export function Menu({ route_info }) {
 
   return (
     <>
-      <h1><i>TTC APP</i></h1>
+      <h1><i>TTC TRACKER APP</i><br /></h1>
       {routes.length && <DropDown info={routes} title="Routes" onSelect={(item) => setUserRoute(item)} attributes={{"title": "title", "value": "tag"}}/>}
       {routeDirections.length && <DropDown info={routeDirections} title="Directions" onSelect={(item) => setUserDirection(item)} attributes={{"title": "direction", "value": "direction"}}/>}
       {routeStops.length && <DropDown info={routeStops} title="Stops" onSelect={(item) => setUserStop(item)} attributes={{"title": "title", "value": "tag"}}/>}

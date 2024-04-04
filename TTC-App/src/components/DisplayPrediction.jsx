@@ -1,11 +1,13 @@
 
+
 export default function DisplayInfo({ predictions }) {
-    
-    return (<>
+    return (
+      <>
         <h1>Latest Prediction</h1>
-        {predictions.map(element => {
-            return (
-            <h3>{element["minute"]} minutes<br /></h3> 
-        )})}
-    </>)
-}
+        <p><i>Next Available Buses Arriving in:</i></p>
+        {predictions.map(element => (
+          <div className="prediction">{element["minute"]} minutes<br /></div>
+        ))}
+      </>
+    );
+  }
